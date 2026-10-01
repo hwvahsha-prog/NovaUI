@@ -531,7 +531,7 @@
                     BorderColor3 = rgb(0, 0, 0);
                     BorderSizePixel = 0;
                     BackgroundColor3 = rgb(14, 14, 16)
-                }); items[ "main" ].Position = dim2(0, items[ "main" ].AbsolutePosition.X, 0, items[ "main" ].AbsolutePosition.Y)
+                });
                 
                 library:create( "UICorner" , {
                     Parent = items[ "main" ];
@@ -3721,6 +3721,14 @@
 
                 task.wait(1)
         
+                items[ "notification" ]:Destroy() 
+            end)
+        end
+    --
+-- 
+
+return library
+  
                 items[ "notification" ]:Destroy() 
             end)
         end
