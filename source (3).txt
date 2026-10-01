@@ -292,49 +292,50 @@
         end
 
         function library:draggify(frame)
-            local dragging = false 
-            local start_size = frame.Position
-            local start 
+    local dragging = false 
+    local start_position
+    local start 
 
-            frame.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                    start = input.Position
-                    start_size = frame.Position
-                end
-            end)
+    frame.InputBegan:Connect(function(input)
+        -- Accept mouse AND touch
+        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            start = input.Position
+            start_position = vec2(frame.AbsolutePosition.X, frame.AbsolutePosition.Y)
+        end
+    end)
 
-            frame.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = false
-                end
-            end)
+    frame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
 
-            library:connection(uis.InputChanged, function(input, game_event) 
-                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local viewport_x = camera.ViewportSize.X
-                    local viewport_y = camera.ViewportSize.Y
+    library:connection(uis.InputChanged, function(input) 
+        -- Accept mouse movement AND touch movement
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement 
+        or input.UserInputType == Enum.UserInputType.Touch) then
+            local viewport_x = camera.ViewportSize.X
+            local viewport_y = camera.ViewportSize.Y
 
-                    local current_position = dim2(
-                        0,
-                        clamp(
-                            start_size.X.Offset + (input.Position.X - start.X),
-                            0,
-                            viewport_x - frame.Size.X.Offset
-                        ),
-                        0,
-                        math.clamp(
-                            start_size.Y.Offset + (input.Position.Y - start.Y),
-                            0,
-                            viewport_y - frame.Size.Y.Offset
-                        )
-                    )
+            local new_x = clamp(
+                start_position.X + (input.Position.X - start.X),
+                0,
+                viewport_x - frame.AbsoluteSize.X
+            )
+            local new_y = clamp(
+                start_position.Y + (input.Position.Y - start.Y),
+                0,
+                viewport_y - frame.AbsoluteSize.Y
+            )
 
-                    library:tween(frame, {Position = current_position}, Enum.EasingStyle.Linear, 0.05)
-                    library:close_element()
-                end
-            end)
-        end 
+            library:tween(frame, {Position = dim2(0, new_x, 0, new_y)}, Enum.EasingStyle.Linear, 0.05)
+            library:close_element()
+        end
+    end)
+end
 
         function library:convert(str)
             local values = {}
@@ -3727,6 +3728,15 @@
     --
 -- 
 
+return library
+  
+                items[ "notification" ]:Destroy() 
+            end)
+        end
+    --
+-- 
+
+return library
 return library
   
                 items[ "notification" ]:Destroy() 
